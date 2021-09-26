@@ -1,0 +1,232 @@
+---
+title: Installation
+---
+
+`lldpd` supports several OS. You can install it from packages or from
+sources. Once installed, you may want to look
+[how to use and configure it]([[usage.html]]).
+
+[TOC]
+
+# GNU/Linux
+
+## Debian and Ubuntu
+
+`lldpd` is already available in Debian and Ubuntu. You can install it
+with:
+
+    ::console
+    $ sudo apt-get install lldpd
+    Reading package lists... Done
+    Building dependency tree       
+    Reading state information... Done
+    The following extra packages will be installed:
+    [...]
+
+It will be installed and configured to start at boot. You can change
+the options of `lldpd` in `/etc/default/lldpd`.
+
+If the package is not recent enough, you can use the
+[Debian backports][] on Debian. Follow the instructions available on
+the website.
+
+If it is still not recent enough, you can grab the appropriate Debian
+package from [openSUSE Build Service][]. Follow the instructions
+available on the website.
+
+The last option is to to [build _lldpd_ from source][]. You can still
+install and uninstall the package to get `_lldpd` user and group, as
+well as a working init script.
+
+## Gentoo
+
+`lldpd` is available in portage. Just issue the command `emerge lldpd`
+to install it. You can also [build _lldpd_ from source][].
+
+## Fedora, RHEL, CentOS
+
+`lldpd` is available from [EPEL][]. First, you need to install the
+`epel-release` package, then just install with `yum install lldpd` or
+`dnf install lldpd`. Once installed, you can change the options
+provided to `lldpd` in `/etc/sysconfig/lldpd`.
+
+Alternatively, you can install the packages
+from [openSUSE Build Service][]. Follow the instructions available on
+the website.
+
+It is also possible to [build _lldpd_ from source][].
+
+## SUSE
+
+On SLES 12, openSUSE Leap 42.3 or openSUSE Tumbleweed, `lldpd` is
+available directly with the following command:
+
+    ::console
+    $ sudo zypper install lldpd
+    The following 11 NEW packages are going to be installed:
+      libbsd0 libdb-4_8 libevent-2_0-5 libgdbm4 liblldpctl4 libsensors4 libsnmp30 libwrap0 lldpd perl snmp-mibs
+    
+    11 new packages to install.
+    Overall download size: 8.7 MiB. Already cached: 0 B. After the operation, additional 47.8 MiB will be used.
+    Continue? [y/n/...? shows all options] (y): y
+    [...]
+    (11/11) Installing: lldpd-0.9.9-2.1.x86_64 ...............[done]
+
+It is also possible to [build _lldpd_ from source][].
+
+## Docker
+
+You can use Docker to run `lldpd`:
+
+    docker run --rm --net=host --uts=host \
+               -v /etc/os-release:/etc/os-release \
+               --cap-add=NET_RAW --cap-add=NET_ADMIN \
+               --name lldpd \
+               ghcr.io/lldpd/lldpd:latest
+
+In place of `latest` which provides you with the latest stable
+version, you may use `1`, `1.0`, `{{ resource.meta.latestversion }}`
+to match specific versions.
+
+To execute `lldpcli`, use:
+
+    docker exec lldpd lldpcli show neighbors
+
+Or to get the command-line:
+
+    docker exec -it lldpd lldpcli
+
+# BSD
+
+`lldpd` is currently available in the ports tree of most BSDs[^ports].
+Follow the instructions on how to install lldpd from ports by following
+the documentation specific to the respective ports tree.
+
+Some BSDs provide up-to-date binary packages using their respective
+package management tools.
+
+Though if you want to [build _lldpd_ from source][]. You can add
+`_lldpd` user with `vipw` and add `_lldpd` group by adding it manually
+in `/etc/group`. The user must not be able to login, have its home as
+`/var/empty` and a disabled shell (like `/bin/false`).
+
+[^ports]: It has been added to the ports tree of OpenBSD (net/lldpd),
+          FreeBSD (net-mgmt/lldpd) and NetBSD's pkgsrc (net/lldpd).
+          DragonFly uses the FreeBSD port with an overlay named DeltaPorts.
+
+You may want to configure `lldpd` with
+`--with-privsep-chroot=/var/empty` to avoid to create
+`/var/run/lldpd`.
+
+If `lldpcli` is not able to provide completion, you can use the `help`
+command instead or install the GNU Readline library on your system.
+
+# macOS
+
+The easiest way is to use the
+[installer package for macOS][lastpkg]. You need at least macOS 10.6.
+
+Alternatively, you can use [Homebrew][]. Check the website if you
+don't have it, it is easy to install. Once installed, type in a
+terminal:
+
+    ::console
+    $ brew install https://raw.github.com/lldpd/lldpd/master/osx/lldpd.rb
+    ######################################################################## 100.0%
+    ==> Downloading https://media.luffy.cx/files/lldpd/lldpd-{{ resource.meta.latestversion }}.tar.gz
+    ==> ./configure --prefix=/usr/local/Cellar/lldpd/{{ resource.meta.latestversion }} --with-xml --with-readline
+    [...]
+
+Pay attention at the instructions at the end of the build: they
+explain how to create `_lldpd` user and group and how to run `lldpd`
+when the system starts.
+
+At least, you can [build _lldpd_ from source][].
+
+# Install from source
+
+This is the last resort method. Other methods are usually simpler.
+
+You first need to download the latest version
+([{{ resource.meta.latestversion }}][lasttgz]) (do not download it
+from GitHub, you would get an incomplete archive). You need a working
+build environment.
+
+    ::console
+    $ tar zxvf lldpd-{{ resource.meta.latestversion }}.tar.gz
+    $ cd lldpd-{{ resource.meta.latestversion }}
+    $ mkdir build
+    $ cd build
+    $ ../configure
+    checking for a BSD-compatible install... /usr/bin/install -c
+    checking whether build environment is sane... yes
+    checking for a thread-safe mkdir -p... /bin/mkdir -p
+    checking for gawk... gawk
+    [...]
+    ------------------ Summary ------------------
+     lldpd version {{ meta.resource.latestversion }}
+      Prefix.........: /usr/local
+      C Compiler.....: gcc -g -O2 -fdiagnostics-show-option -std=gnu99 -pipe -Wall -W -Wextra -Wformat -Wformat-security -Wcast-align -Winline -fstack-protector -D_FORTIFY_SOURCE=2 -Wdeclaration-after-statement -Wno-unused-parameter -Wno-sign-compare 
+      Linker.........: /usr/bin/ld -m elf_x86_64  -Wl,-z,relro -Wl,-z,now 
+      Libevent.......: system
+     Optional features:
+      SNMP support...: no
+      CDP............: yes
+      FDP............: yes
+      EDP............: yes
+      SONMP..........: yes
+      LLDPMED........: yes
+      DOT1...........: yes
+      DOT3...........: yes
+      XML output.....: no
+    ---------------------------------------------
+
+    Check the above options and compile with:
+     make
+
+If this steps fail, feel free to [file a bug report][]. The content
+of `config.log` should be helpful. Otherwise, check if everything is
+as you expect and continue.
+
+    ::console
+    $ make
+      CC     strlcpy.lo
+      CCLD   libcompat.la
+      CC     log.lo
+    [...]
+    make[1]: Leaving directory `/home/bernat/src/lldpd-{{ resource.meta.latestversion }}'
+
+If this steps fail, feel free to [file a bug report][] too with the
+output and some details on your platform. The `config.log` is also
+useful in this case.
+
+You can finish the installation with `make install`. Then, you still
+have to complete the following steps by yourself. They are system
+specifics:
+
+ - Ensure the `liblldpctl` library is correctly registered with the
+   system. The output of `make install` should give the appropriate
+   steps. On Linux, this is `ldconfig`.
+ - Create a `_lldpd` user and a `_lldpd` group. This is needed for
+   privilege seperation (increased security).
+ - Create the chroot (`/usr/local/var/run/lldpd` by default). It is just an
+   empty directory.
+ - Ensure that `lldpd` is started at boot.
+
+`../configure` accepts several options. You can get them with
+`../configure --help`. The most interesting ones are `--with-snmp` and
+`--with-xml`.
+
+[lasttgz]: https://media.luffy.cx/files/lldpd/lldpd-{{ resource.meta.latestversion }}.tar.gz "lldpd {{ resource.meta.latestversion }} version"
+[lastpkg]: https://media.luffy.cx/files/lldpd/lldpd-{{ resource.meta.latestversion }}.pkg "lldpd {{ resource.meta.latestversion }} version for OSX"
+[file a bug report]: https://github.com/lldpd/lldpd/issues "GitHub bug tracker for lldpd"
+[Debian backports]: https://backports.debian.org "Debian Backports"
+[openSUSE Build Service]: http://software.opensuse.org/download.html?project=home:vbernat&package=lldpd "lldpd on OSC"
+[build _lldpd_ from source]: #install-from-source
+[Homebrew]: http://brew.sh/ "Homebrew: the missing package manager for macOS"
+[EPEL]: https://fedoraproject.org/wiki/EPEL "EPEL"
+
+{# Local Variables:      #}
+{# mode: markdown        #}
+{# indent-tabs-mode: nil #}
+{# End:                  #}

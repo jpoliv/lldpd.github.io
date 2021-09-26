@@ -1,0 +1,39 @@
+mode: development
+media_root: media
+media_url: /media
+base_url: /
+plugins:
+  - hyde.ext.plugins.meta.MetaPlugin
+  - extensions.combine.CombinePlugin
+  - hyde.ext.plugins.auto_extend.AutoExtendPlugin
+  - hyde.ext.plugins.less.LessCSSPlugin
+  - extensions.text.IncludeManpagePlugin
+  - hyde.ext.plugins.textlinks.TextlinksPlugin
+  - hyde.ext.plugins.images.ImageSizerPlugin
+  - hyde.ext.plugins.optipng.OptiPNGPlugin
+  - hyde.ext.plugins.urls.UrlCleanerPlugin
+context:
+  data:
+    base: https://lldpd.github.io
+meta:
+  latestversion: "1.0.12"
+  nodemeta: meta.yaml
+  extends: base.j2
+  default_block: article
+less:
+  app: /usr/bin/lessc
+  args:
+    compress: ""
+optipng:
+  app: /usr/bin/optipng
+  args:
+    quiet: ""
+markdown:
+  extensions:
+    - markdown.extensions.codehilite
+    - markdown.extensions.extra
+    - markdown.extensions.toc
+  output_format: html
+urlcleaner:
+  index_file_names:
+    - index.html
